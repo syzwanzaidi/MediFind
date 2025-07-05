@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="#FFFFFF">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="BOOK APPOINTMENT"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="#2E86DE"
+        android:gravity="center"
+        android:paddingBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etClinicName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Clinic Name"
+        android:inputType="textPersonName"
+        android:padding="12dp"
+        android:background="@drawable/edittext_background"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Date"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:backgroundTint="#2E86DE"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Time"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:backgroundTint="#2E86DE"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SAVE APPOINTMENT"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:backgroundTint="#2E86DE" />
+
+</LinearLayout>
