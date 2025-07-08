@@ -2,7 +2,6 @@ package com.example.medifind;
 
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -32,8 +31,8 @@ public class HomeActivity extends AppCompatActivity {
                 selectedFragment = new HomeFragment();
 //            } else if (itemId == R.id.nav_find_clinic) {
 //                selectedFragment = new FindClinicFragment();
-//            } else if (itemId == R.id.nav_add_appointment) {
-//                selectedFragment = new AddAppointmentFragment();
+            } else if (itemId == R.id.nav_add_appointment) {
+                selectedFragment = new AppointmentFragment();
             } else if (itemId == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();
             }

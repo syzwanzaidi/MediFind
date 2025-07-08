@@ -1,22 +1,24 @@
 package com.example.medifind;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationManagerCompat;
-
-import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.TimePickerDialog;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -25,25 +27,29 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-public class AppointmentReminderActivity extends AppCompatActivity {
+public class AppointmentFragment extends Fragment {
 
     EditText etClinicName;
     Button btnDate, btnTime, btnSave;
-    int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
+    int selectedYear = 0, selectedMonth = 0, selectedDay = 0, selectedHour = -1, selectedMinute = -1;
 
     DatabaseReference databaseReference;
     FirebaseAuth mAuth;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_appointment_reminder);
+    public AppointmentFragment() {}
 
-        etClinicName = findViewById(R.id.etClinicName);
-        btnDate = findViewById(R.id.btnDate);
-        btnTime = findViewById(R.id.btnTime);
-        btnSave = findViewById(R.id.btnSave);
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_appointment, container, false);
+
+        etClinicName = view.findViewById(R.id.etClinicName);
+        btnDate = view.findViewById(R.id.btnDate);
+        btnTime = view.findViewById(R.id.btnTime);
+        btnSave = view.findViewById(R.id.btnSave);
 
         mAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("Appointments");
@@ -53,11 +59,13 @@ public class AppointmentReminderActivity extends AppCompatActivity {
         btnDate.setOnClickListener(v -> showDatePicker());
         btnTime.setOnClickListener(v -> showTimePicker());
         btnSave.setOnClickListener(v -> saveAppointment());
+
+        return view;
     }
 
     private void showDatePicker() {
         Calendar calendar = Calendar.getInstance();
-        new DatePickerDialog(this, (view, year, month, day) -> {
+        new DatePickerDialog(requireContext(), (view, year, month, day) -> {
             selectedYear = year;
             selectedMonth = month;
             selectedDay = day;
@@ -67,7 +75,7 @@ public class AppointmentReminderActivity extends AppCompatActivity {
 
     private void showTimePicker() {
         Calendar calendar = Calendar.getInstance();
-        new TimePickerDialog(this, (view, hour, minute) -> {
+        new TimePickerDialog(requireContext(), (view, hour, minute) -> {
             selectedHour = hour;
             selectedMinute = minute;
             btnTime.setText(String.format("%02d:%02d", hour, minute));
@@ -77,8 +85,8 @@ public class AppointmentReminderActivity extends AppCompatActivity {
     private void saveAppointment() {
         String clinicName = etClinicName.getText().toString().trim();
 
-        if (clinicName.isEmpty() || selectedYear == 0 || selectedHour == 0) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+        if (clinicName.isEmpty() || selectedYear == 0 || selectedHour == -1) {
+            Toast.makeText(requireContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -97,30 +105,37 @@ public class AppointmentReminderActivity extends AppCompatActivity {
         databaseReference.child(appointmentId).setValue(appointmentData)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        scheduleNotification();
-                        Toast.makeText(this, "Appointment Saved!", Toast.LENGTH_SHORT).show();
-                        finish();
+                        scheduleReminderWithWorkManager(clinicName);
+                        Toast.makeText(requireContext(), "Appointment Saved!", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(this, "Failed to save appointment", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Failed to save appointment", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    private void scheduleNotification() {
-        Intent intent = new Intent(this, ReminderBroadcast.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
+    private void scheduleReminderWithWorkManager(String clinicName) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute, 0);
 
         long appointmentTime = calendar.getTimeInMillis();
         long reminderTime = appointmentTime - (60 * 60 * 1000); // 1 hour before
+        long delay = reminderTime - System.currentTimeMillis();
 
-        if (reminderTime > System.currentTimeMillis()) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTime, pendingIntent);
+        if (delay <= 0) {
+            Toast.makeText(requireContext(), "Reminder time is in the past", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        Data data = new Data.Builder()
+                .putString("clinicName", clinicName)
+                .build();
+
+        OneTimeWorkRequest reminderRequest = new OneTimeWorkRequest.Builder(ReminderWorker.class)
+                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                .setInputData(data)
+                .build();
+
+        WorkManager.getInstance(requireContext()).enqueue(reminderRequest);
     }
 
     private void createNotificationChannel() {
@@ -130,7 +145,7 @@ public class AppointmentReminderActivity extends AppCompatActivity {
                     "Appointment Reminders",
                     NotificationManager.IMPORTANCE_HIGH
             );
-            NotificationManager manager = getSystemService(NotificationManager.class);
+            NotificationManager manager = requireContext().getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
         }
     }
