@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "607852066373",
+    "project_id": "medifind-4c977",
+    "storage_bucket": "medifind-4c977.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:607852066373:android:82521708eee7a028dcd52c",
+        "android_client_info": {
+          "package_name": "com.example.medifind"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAglUJ2MN7XD4ahH2fxDmF6qcoruiyDxUU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
