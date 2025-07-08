@@ -1,5 +1,6 @@
 package com.example.medifind;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -76,6 +77,9 @@ public class ProfileActivity extends AppCompatActivity {
             return;
         }
 
+        // Go to HomeActivity [FOR TESTING ONLY]
+        startActivity(new Intent(this, HomeActivity.class));
+
         String uid = user.getUid();
         Log.d("SAVE_DEBUG", "User UID: " + uid);
 
@@ -86,11 +90,15 @@ public class ProfileActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Toast.makeText(this, "Saved successfully!", Toast.LENGTH_SHORT).show();
                         Log.d("SAVE_DEBUG", "Saved successfully to Firebase");
+//                        // Go to HomeActivity
+//                        startActivity(new Intent(this, HomeActivity.class));
+                        finish();
                     } else {
                         Toast.makeText(this, "Failed to save!", Toast.LENGTH_SHORT).show();
                         Log.e("SAVE_DEBUG", "Save failed");
                     }
-                })
+                }
+                )
                 .addOnFailureListener(e -> {
                     Log.e("SAVE_DEBUG", "Save error: ", e);
                 });

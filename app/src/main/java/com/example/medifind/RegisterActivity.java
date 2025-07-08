@@ -57,7 +57,8 @@ public class RegisterActivity extends AppCompatActivity {
                                 Intent i = new Intent(getApplicationContext(),ProfileActivity.class);
                                 startActivity(i);
                             }else{
-                                Toast.makeText(getApplicationContext(),"User could not be found",Toast.LENGTH_SHORT).show();
+                                String error = task.getException().getMessage();
+                                Toast.makeText(getApplicationContext(), "Error: " + error, Toast.LENGTH_LONG).show();
                             }
                         }
                     });
