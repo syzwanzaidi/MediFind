@@ -17,6 +17,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -34,28 +36,45 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
-        e1 = (EditText)findViewById(R.id.editText);
-        e2 = (EditText)findViewById(R.id.editText2);
+        e1 = findViewById(R.id.editText);   // Email
+        e2 = findViewById(R.id.editText2);  // Password
 
         mAuth = FirebaseAuth.getInstance();
     }
 
     public void loginUser(View v){
-        if(e1.getText().toString().equals("") && e2.getText().toString().equals("")){
-            Toast.makeText(getApplicationContext(),"Blank not allowed", Toast.LENGTH_SHORT).show();
+        String email = e1.getText().toString().trim();
+        String password = e2.getText().toString().trim();
 
-        }else{
-            mAuth.signInWithEmailAndPassword(e1.getText().toString(),e2.getText().toString())
+        if(email.isEmpty() || password.isEmpty()){
+            Toast.makeText(getApplicationContext(), "Blank not allowed", Toast.LENGTH_SHORT).show();
+        } else {
+            mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
-                                Toast.makeText(getApplicationContext(),"User logged in succesfully",Toast.LENGTH_SHORT).show();
-                                finish();
-                                Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
-                                startActivity(i);
-                            }else{
-                                Toast.makeText(getApplicationContext(),"User could not be login",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Login successful", Toast.LENGTH_SHORT).show();
+
+                                String uid = mAuth.getCurrentUser().getUid();
+                                DatabaseReference userRef = FirebaseDatabase
+                                        .getInstance("https://medifind-62da5-default-rtdb.asia-southeast1.firebasedatabase.app")
+                                        .getReference("Users").child(uid);
+
+                                userRef.get().addOnCompleteListener(profileTask -> {
+                                    if (profileTask.isSuccessful() && profileTask.getResult().exists()) {
+                                        // Profile exists → Go to Home
+                                        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                                        startActivity(intent);
+                                    } else {
+                                        // No profile → Go to ProfileActivity
+                                        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                                        startActivity(intent);
+                                    }
+                                    finish();
+                                });
+                            } else {
+                                Toast.makeText(getApplicationContext(), "User could not be login", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });

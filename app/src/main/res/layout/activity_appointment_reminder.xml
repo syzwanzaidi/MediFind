@@ -7,6 +7,7 @@
     android:padding="24dp"
     android:background="#FFFFFF">
 
+    <!-- Title -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,16 +18,21 @@
         android:gravity="center"
         android:paddingBottom="16dp" />
 
+    <!-- Clinic Name -->
     <EditText
         android:id="@+id/etClinicName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/edittext_background"
         android:hint="Clinic Name"
         android:inputType="textPersonName"
+        android:minHeight="48dp"
         android:padding="12dp"
-        android:background="@drawable/edittext_background"
-        android:layout_marginBottom="16dp"/>
+        android:textColor="#000000"
+        android:textSize="16sp" />
 
+    <!-- Date Button -->
     <Button
         android:id="@+id/btnDate"
         android:layout_width="match_parent"
@@ -37,6 +43,7 @@
         android:backgroundTint="#2E86DE"
         android:layout_marginBottom="12dp"/>
 
+    <!-- Time Button -->
     <Button
         android:id="@+id/btnTime"
         android:layout_width="match_parent"
@@ -47,6 +54,7 @@
         android:backgroundTint="#2E86DE"
         android:layout_marginBottom="24dp"/>
 
+    <!-- Save Button -->
     <Button
         android:id="@+id/btnSave"
         android:layout_width="match_parent"
@@ -54,6 +62,6 @@
         android:text="SAVE APPOINTMENT"
         android:textColor="@android:color/white"
         android:textSize="18sp"
-        android:backgroundTint="#2E86DE" />
+        android:backgroundTint="#2E86DE"/>
 
 </LinearLayout>
