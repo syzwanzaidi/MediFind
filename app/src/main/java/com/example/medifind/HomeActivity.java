@@ -30,7 +30,9 @@ public class HomeActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_reminder) {
                 selectedFragment = new ReminderFragment();
             } else if (itemId == R.id.nav_profile) {
-                selectedFragment = new ProfileFragment();
+            selectedFragment = new ProfileFragment();
+            } else if (itemId == R.id.nav_maps) {
+                selectedFragment = new MapsFragment();
             }
 
             if (selectedFragment != null) {

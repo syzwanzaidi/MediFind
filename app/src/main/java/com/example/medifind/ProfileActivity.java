@@ -58,6 +58,28 @@ public class ProfileActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance("https://medifind-62da5-default-rtdb.asia-southeast1.firebasedatabase.app")
                 .getReference("Users");
 
+        // Load current user data and pre-fill
+        if (user != null) {
+            String uid = user.getUid();
+            database.child(uid).get().addOnSuccessListener(snapshot -> {
+                if (snapshot.exists()) {
+                    UserProfile profile = snapshot.getValue(UserProfile.class);
+                    if (profile != null) {
+                        nameField.setText(profile.name);
+                        ageField.setText(profile.age);
+                        phoneField.setText(profile.phone);
+
+                        // Set gender spinner selection
+                        ArrayAdapter<CharSequence> genderAdapter = (ArrayAdapter<CharSequence>) genderSpinner.getAdapter();
+                        int pos = genderAdapter.getPosition(profile.gender);
+                        genderSpinner.setSelection(pos);
+                    }
+                }
+            }).addOnFailureListener(e -> {
+                Log.e("PROFILE_LOAD", "Failed to load profile: ", e);
+                Toast.makeText(this, "Failed to load profile", Toast.LENGTH_SHORT).show();
+            });
+        }
     }
 
     public void saveProfile(View view) {
@@ -77,9 +99,6 @@ public class ProfileActivity extends AppCompatActivity {
             return;
         }
 
-        // Go to HomeActivity [FOR TESTING ONLY]
-        startActivity(new Intent(this, HomeActivity.class));
-
         String uid = user.getUid();
         Log.d("SAVE_DEBUG", "User UID: " + uid);
 
@@ -90,18 +109,21 @@ public class ProfileActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Toast.makeText(this, "Saved successfully!", Toast.LENGTH_SHORT).show();
                         Log.d("SAVE_DEBUG", "Saved successfully to Firebase");
-//                        // Go to HomeActivity
-//                        startActivity(new Intent(this, HomeActivity.class));
+                        startActivity(new Intent(this, HomeActivity.class));
                         finish();
                     } else {
                         Toast.makeText(this, "Failed to save!", Toast.LENGTH_SHORT).show();
                         Log.e("SAVE_DEBUG", "Save failed");
                     }
-                }
-                )
+                })
                 .addOnFailureListener(e -> {
                     Log.e("SAVE_DEBUG", "Save error: ", e);
                 });
+    }
+    public void cancelEdit(View view) {
+        Toast.makeText(this, "Edit cancelled", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(this, HomeActivity.class));
+        finish();
     }
 
 }

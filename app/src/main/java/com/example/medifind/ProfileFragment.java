@@ -1,9 +1,11 @@
 package com.example.medifind;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,9 +24,9 @@ import com.google.firebase.database.ValueEventListener;
 public class ProfileFragment extends Fragment {
 
     TextView nameView, ageView, genderView, phoneView;
-
     DatabaseReference database;
     FirebaseUser user;
+    FirebaseAuth auth;
 
     @Nullable
     @Override
@@ -39,7 +41,26 @@ public class ProfileFragment extends Fragment {
         genderView = view.findViewById(R.id.display_gender);
         phoneView = view.findViewById(R.id.display_phone);
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
+        Button editButton = view.findViewById(R.id.btn_edit_profile);
+        editButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ProfileActivity.class);
+            startActivity(intent);
+        });
+
+        Button logoutButton = view.findViewById(R.id.btn_logout);
+        logoutButton.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            Toast.makeText(getContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
+
+            // Go to LoginActivity
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // clear backstack
+            startActivity(intent);
+            getActivity().finish();
+        });
+
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
 
         if (user != null) {
             String uid = user.getUid();

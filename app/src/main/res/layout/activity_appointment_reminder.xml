@@ -7,6 +7,15 @@
     android:padding="24dp"
     android:background="#FFFFFF">
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/appointment_box_bg"
+        android:padding="20dp"
+        android:elevation="4dp">
+
     <!-- Title -->
     <TextView
         android:layout_width="match_parent"
@@ -19,18 +28,18 @@
         android:paddingBottom="16dp" />
 
     <!-- Clinic Name -->
-    <EditText
-        android:id="@+id/etClinicName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/edittext_background"
-        android:hint="Clinic Name"
-        android:inputType="textPersonName"
-        android:minHeight="48dp"
-        android:padding="12dp"
-        android:textColor="#000000"
-        android:textSize="16sp" />
+        <EditText
+            android:id="@+id/etClinicName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/edittext_background"
+            android:hint="Clinic Name"
+            android:inputType="textPersonName"
+            android:minHeight="48dp"
+            android:padding="12dp"
+            android:textColor="#000000"
+            android:textSize="16sp" />
 
     <!-- Date Button -->
     <Button
@@ -65,3 +74,5 @@
         android:backgroundTint="#2E86DE"/>
 
 </LinearLayout>
+
+    </LinearLayout>
