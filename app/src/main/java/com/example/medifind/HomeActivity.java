@@ -33,6 +33,8 @@ public class HomeActivity extends AppCompatActivity {
             selectedFragment = new ProfileFragment();
             } else if (itemId == R.id.nav_maps) {
                 selectedFragment = new MapsFragment();
+            } else if (itemId == R.id.nav_about) {
+                selectedFragment = new AboutUsFragment();
             }
 
             if (selectedFragment != null) {

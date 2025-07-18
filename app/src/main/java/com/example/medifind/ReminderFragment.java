@@ -135,19 +135,48 @@ public class ReminderFragment extends Fragment {
     }
 
     private void scheduleNotification() {
+        String clinicName = etClinicName.getText().toString().trim();
+        String dateText = String.format("%02d/%02d/%04d", selectedDay, selectedMonth + 1, selectedYear);
+        String timeText = String.format("%02d:%02d", selectedHour, selectedMinute);
+
         Intent intent = new Intent(requireContext(), ReminderBroadcast.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE);
+        intent.putExtra("clinicName", clinicName);
+        intent.putExtra("date", dateText);
+        intent.putExtra("time", timeText);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                requireContext(), 0, intent,
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
         AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
 
-        long reminderTime = System.currentTimeMillis() + 5000; // 5 seconds from now
+        // Set appointment time
+        Calendar appointmentTime = Calendar.getInstance();
+        appointmentTime.set(Calendar.YEAR, selectedYear);
+        appointmentTime.set(Calendar.MONTH, selectedMonth);
+        appointmentTime.set(Calendar.DAY_OF_MONTH, selectedDay);
+        appointmentTime.set(Calendar.HOUR_OF_DAY, selectedHour);
+        appointmentTime.set(Calendar.MINUTE, selectedMinute);
+        appointmentTime.set(Calendar.SECOND, 0);
+        appointmentTime.set(Calendar.MILLISECOND, 0);
+
+        // Schedule reminder 10 seconds before the appointment time
+        long reminderTimeMillis = appointmentTime.getTimeInMillis() - (10 * 1000); // 10 seconds before
+
+        if (reminderTimeMillis < System.currentTimeMillis()) {
+            Toast.makeText(requireContext(), "Reminder time already passed", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (alarmManager.canScheduleExactAlarms()) {
-                alarmManager.set(AlarmManager.RTC_WAKEUP, reminderTime, pendingIntent);
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent);
             }
         } else {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, reminderTime, pendingIntent);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent);
         }
+
+        Toast.makeText(requireContext(), "Reminder set for " + timeText, Toast.LENGTH_SHORT).show();
     }
 
     private void createNotificationChannel() {

@@ -12,19 +12,26 @@ import androidx.core.app.NotificationManagerCompat;
 public class ReminderBroadcast extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        // Android 13+ permission check
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
                     != PackageManager.PERMISSION_GRANTED) {
-                return; // Exit if no permission
+                return;
             }
         }
 
+        String clinicName = intent.getStringExtra("clinicName");
+        String date = intent.getStringExtra("date");
+        String time = intent.getStringExtra("time");
+
+        String title = "Appointment at " + clinicName;
+        String message = "Scheduled on " + date + " at " + time;
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "appointment_channel")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)  // Use ic_launcher_foreground if custom icon not available
-                .setContentTitle("Appointment Reminder")
-                .setContentText("You have an upcoming appointment!")
-                .setPriority(NotificationCompat.PRIORITY_HIGH);
+                .setSmallIcon(R.drawable.logo)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.notify(200, builder.build());
