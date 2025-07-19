@@ -164,7 +164,7 @@ public class ReminderFragment extends Fragment {
         long reminderTimeMillis = appointmentTime.getTimeInMillis() - (10 * 1000); // 10 seconds before
 
         if (reminderTimeMillis < System.currentTimeMillis()) {
-            Toast.makeText(requireContext(), "Reminder time already passed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Reminder time already passed, Please recheck your appointment time.", Toast.LENGTH_SHORT).show();
             return;
         }
 
