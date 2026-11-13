@@ -21,10 +21,6 @@
         android:theme="@style/Theme.MediFind"
         tools:targetApi="31">
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDaIznz2GoGbBMckZfNE73_ru2FvBab5TA" />
-
         <!-- Activities -->
         <activity android:name=".HomeActivity" android:exported="false" />
         <activity android:name=".ProfileActivity" android:exported="false" />
